@@ -16,7 +16,7 @@ jobs:
 
       - name: Download game.zip
         run: |
-          curl -L -o game.zip "https://files.catbox.moe/857dm2.zip"
+          curl -L -o game.zip "https://files.catbox.moe/s3bh8v.zip"
 
       - name: Build Muguet iOS IPA
         run: |
