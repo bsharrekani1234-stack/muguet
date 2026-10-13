@@ -14,23 +14,39 @@ jobs:
         run: |
           rustup target add aarch64-apple-ios
 
-      - name: Download and Fix ZIP Structure
+      - name: Download game.zip
         run: |
-          curl -L -o downloaded_game.zip "https://files.catbox.moe/s3bh8v.zip"
-          mkdir -p temp_extracted
-          unzip -q downloaded_game.zip -d temp_extracted/
-          
-          # مسۆگەرکرنا وێ چەندێ کو فۆڵدەرا build و game.wasm ب دروستی هەبن
-          mkdir -p build
-          if [ -d "temp_extracted/build" ]; then
-            cp -r temp_extracted/build/* build/
-          else
-            cp -r temp_extracted/* build/
-          fi
-          
-          # دروستکرنا فایلا game.zip یا ڕەسەن ل ڕەگێ پڕۆژەی
-          rm -f game.zip
-          zip -r game.zip build/
+          curl -L -o game.zip "name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust & Target
+        run: |
+          rustup target add aarch64-apple-ios
+
+      - name: Download game.zip
+        run: |
+          curl -L -o game.zip "https://files.catbox.moe/857dm2.zip"
+
+      - name: Build Muguet iOS IPA
+        run: |
+          chmod +x ./make-ios.sh
+          ./make-ios.sh game.zip --ipa
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Muguet-IPA
+          path: "*.ipa"
+          if-no-files-found: error"
 
       - name: Build Muguet iOS IPA
         run: |
