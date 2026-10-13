@@ -14,9 +14,20 @@ jobs:
         run: |
           rustup target add aarch64-apple-ios
 
-      - name: Download game.zip
+      - name: Download and Fix game.zip structure
         run: |
           curl -L -o game.zip "https://files.catbox.moe/s3bh8v.zip"
+          mkdir -p extracted_game
+          unzip -q game.zip -d extracted_game/
+          rm game.zip
+          mkdir -p build
+          # ئەگەر فایلەکان ڕاستەوخۆ بوون یان لە ناو فۆڵدەرێک بوون، دەیانخەینە ناو build
+          if [ -d "extracted_game/build" ]; then
+            cp -r extracted_game/build/* build/
+          else
+            cp -r extracted_game/* build/
+          fi
+          zip -r game.zip build/
 
       - name: Build Muguet iOS IPA
         run: |
