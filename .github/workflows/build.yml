@@ -10,23 +10,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode 16
-        run: sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer || true
-
-      - name: Install Rust & Target
+      - name: Setup Rust & Target
         run: |
-          rustup toolchain install 1.98.1
-          rustup target add aarch64-apple-ios --toolchain 1.98.1
+          rustup target add aarch64-apple-ios
 
-      - name: Install xcodegen
-        run: brew install xcodegen
-
-      - name: Build IPA
+      - name: Verify game.zip
         run: |
-          FREE=1 BUNDLE_ID="org.muguet.gta5" ./make-ios.sh --ipa
+          if [ ! -f "game.zip" ]; then
+            echo "Error: game.zip not found in repository root!"
+            exit 1
+          fi
+
+      - name: Build Muguet iOS IPA
+        run: |
+          chmod +x ./make-ios.sh
+          ./make-ios.sh game.zip --ipa
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Muguet-IPA
-          path: build/Muguet.ipa
+          path: "*.ipa"
+          if-no-files-found: error
