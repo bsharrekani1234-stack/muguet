@@ -1,0 +1,34 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust & Target
+        run: |
+          rustup target add aarch64-apple-ios
+
+      - name: Verify game.zip
+        run: |
+          if [ ! -f "game.zip" ]; then
+            echo "Error: game.zip not found in repository root!"
+            exit 1
+          fi
+
+      - name: Build Muguet iOS IPA
+        run: |
+          chmod +x ./make-ios.sh
+          ./make-ios.sh game.zip --ipa
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Muguet-IPA
+          path: "*.ipa"
+          if-no-files-found: error
