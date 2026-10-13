@@ -14,12 +14,9 @@ jobs:
         run: |
           rustup target add aarch64-apple-ios
 
-      - name: Verify game.zip
+      - name: Download game.zip
         run: |
-          if [ ! -f "game.zip" ]; then
-            echo "Error: game.zip not found in repository root!"
-            exit 1
-          fi
+          curl -L -o game.zip "https://files.catbox.moe/857dm2.zip"
 
       - name: Build Muguet iOS IPA
         run: |
